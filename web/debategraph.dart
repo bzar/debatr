@@ -11,6 +11,24 @@ class Layers {
   Selection lines;
 }
 
+class Point {
+  Point(this.x, this.y);
+  num x;
+  num y;
+  operator -(Point other) => new Point(x - other.x, y - other.y);
+}
+
+class MouseMovementTracker {
+  Point previousPosition = null;
+  Point position = null;
+  Point get movement => previousPosition != null ? position - previousPosition : new Point(0, 0);
+
+  void updateFromEvent(MouseEvent e) {
+    previousPosition = position;
+    position = new Point(e.client.x, e.client.y);
+  }
+}
+
 class DebateGraph {
   SelectionScope scope;
   Selection svg;
@@ -19,20 +37,20 @@ class DebateGraph {
 
   Premise dragged = null;
   bool panning = false;
+  MouseMovementTracker tracker = new MouseMovementTracker();
   
   num zoom = 1;
-  num originx = 0;
-  num originy = 0;
+  Point origin = new Point(0, 0);
   
   static final Map<String, String> nodeColors = {
-    "undisputed": "#0f0",
-    "disputed": "#f00",
-    "controversial": "#ff0"
+    "undisputed": "#00f000",
+    "disputed": "#f00000",
+    "controversial": "#f0f000"
   };
 
   static final Map<String, String> connectionColors = {
-    "dispute": "#f00",
-    "support": "#0f0"
+    "dispute": "#f00000",
+    "support": "#00f000"
   };
 
   DebateGraph(String elementSelector, this.debate) {
@@ -49,12 +67,17 @@ class DebateGraph {
       ..nodeTexts =  container.append("g");
     
     void mouseUp(dynamic d, int ei, Element e) {
+      scope.event.preventDefault();
+      scope.event.stopPropagation();
       dragged = null;
       panning = false;
     }
     
     void mouseDown(dynamic d, int ei, Element e) {
+      scope.event.preventDefault();
+      scope.event.stopPropagation();
       panning = true;
+      MouseEvent e = scope.event as MouseEvent;
     }
     
     void mouseMove(dynamic d, int ei, Element e) {
@@ -62,13 +85,14 @@ class DebateGraph {
       scope.event.stopPropagation();
       MouseEvent e = scope.event as MouseEvent;
       if(dragged != null) {
-        dragged.x += e.movement.x / zoom;
-        dragged.y += e.movement.y / zoom;
+        dragged.x += tracker.movement.x / zoom;
+        dragged.y += tracker.movement.y / zoom;
       } else if(panning) {
-        originx += e.movement.x;
-        originy += e.movement.y;
-        container.attr("transform", "translate($originx, $originy)scale($zoom)");
+        origin.x += tracker.movement.x;
+        origin.y += tracker.movement.y;
+        container.attr("transform", "translate(${origin.x}, ${origin.y})scale($zoom)");
       }
+      tracker.updateFromEvent(e);
       update();
     }
     
@@ -76,12 +100,12 @@ class DebateGraph {
       scope.event.preventDefault();
       scope.event.stopPropagation();
       WheelEvent e = scope.event as WheelEvent;
-      if(e.wheelDeltaY < 0 && zoom > 0.5) {
+      if(e.deltaY > 0 && zoom > 0.5) {
         zoom -= 0.1;
-      } else if(e.wheelDeltaY > 0 && zoom < 1) {
+      } else if(e.deltaY < 0 && zoom < 1) {
         zoom += 0.1;
       }
-      container.attr("transform", "translate($originx, $originy)scale($zoom)");
+      container.attr("transform", "translate(${origin.x}, ${origin.y})scale($zoom)");
     }
     svg.on("mousemove", mouseMove);
     svg.on("mouseup", mouseUp);
@@ -104,7 +128,7 @@ class DebateGraph {
     
     lines.transition()
       ..duration(25)
-    //  ..styleWithCallback("stroke", connectionColor)
+      ..styleWithCallback("stroke", connectionColor)
       ..attrWithCallback("x1", (d,i,e) => d.premise.x)
       ..attrWithCallback("y1", (d,i,e) => d.premise.y)
       ..attrWithCallback("x2", (d,i,e) => d.assertion.x)
@@ -121,7 +145,7 @@ class DebateGraph {
     
     connectionNodes.transition()
       ..duration(25)
-    //  ..attrWithCallback("fill", nodeColor)
+      ..attrWithCallback("fill", nodeColor)
       ..attrWithCallback("cx", (d,i,e) => d.x)
       ..attrWithCallback("cy", (d,i,e) => d.y);
       
@@ -138,7 +162,7 @@ class DebateGraph {
     
     nodes.transition()
       ..duration(25)
-      //..attrWithCallback("fill", nodeColor)
+      ..attrWithCallback("fill", nodeColor)
       ..attrWithCallback("cx", (d,i,e) => d.x)
       ..attrWithCallback("cy", (d,i,e) => d.y);
     
