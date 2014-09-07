@@ -2,10 +2,21 @@ library debate;
 
 class Debate {
   Map<String, Assertion> _assertions = new Map<String, Assertion>();
+  int nextId = 0;
   
-  void add(Assertion a) {
+  String add(Assertion a) {
+    if(a.id == null) {
+      a.id = nextId.toString();
+      nextId += 1;
+    } else {
+      int idValue = int.parse(a.id);
+      if(idValue >= nextId) {
+        nextId = idValue + 1;
+      }
+    }
     a.debate = this;
     _assertions[a.id] = a;
+    return a.id;
   }
   
   Assertion get(String id) => _assertions[id];
@@ -32,6 +43,42 @@ class Debate {
       .where((a) => a != null)
       .forEach(add);
   }
+
+  void refresh() {
+    var getDisputedBy = (Assertion a) => connections
+        .where((b) => b.type == "dispute")
+        .where((c) => c.assertionId == a.id)
+        .toList(growable:false);
+    Map<String, List<Connection>> disputedBy = new Map.fromIterable(_assertions.values, key: (a) => a.id, value: getDisputedBy);
+
+    var falsePremise = (Connection c) => c.premise.status == "false";
+    var validDispute = (Connection c) => c.status == "undisputed" && c.premise.status == "undisputed";
+
+    bool statusChanged = true;
+    while(statusChanged) {
+      statusChanged = false;
+      for(Assertion a in _assertions.values) {
+        if(a.status == "false") {
+          continue;
+        }
+
+        String oldStatus = a.status;
+        List<Connection> children = disputedBy[a.id];
+
+        if(children == null || children.every(falsePremise)) {
+          a.status = "undisputed";
+        } else if(children.any(validDispute)) {
+          a.status = "disputed";
+        } else {
+          a.status = "controversial";
+        }
+
+        if(oldStatus != a.status) {
+          statusChanged = true;
+        }
+      }
+    }
+  }
 }
 
 abstract class Assertion {
@@ -49,6 +96,9 @@ class Premise extends Assertion {
   num x;
   num y;
 
+  Premise() {
+
+  }
   Premise.fromJson(Map obj) {
     id = obj["id"];
     type = obj["type"];
@@ -64,6 +114,9 @@ class Connection extends Assertion {
   String assertionId;
   String premiseId;
   
+  Connection() {
+
+  }
   Connection.fromJson(Map obj) {
     id = obj["id"];
     type = obj["type"];

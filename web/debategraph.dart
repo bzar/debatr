@@ -29,11 +29,17 @@ class MouseMovementTracker {
   }
 }
 
+typedef E AssertionSelectedCallback<E>(Assertion, DebateGraph);
+
 class DebateGraph {
+
   SelectionScope scope;
   Selection svg;
   Debate debate;
   Layers layers;
+
+  Assertion selected = null;
+  AssertionSelectedCallback onSelected = null;
 
   Premise dragged = null;
   bool panning = false;
@@ -56,15 +62,15 @@ class DebateGraph {
   DebateGraph(String elementSelector, this.debate) {
     scope = new SelectionScope.selector(elementSelector);
     svg = scope.append('svg:svg')
-      ..attr("width", "100%")
-      ..attr("height", "100%");
+    ..attr("width", "100%")
+    ..attr("height", "100%");
     
     Selection container = svg.append("g");
     layers = new Layers()
-      ..lines = container.append("g")  
-      ..nodes = container.append("g")
-      ..connectionNodes = container.append("g")
-      ..nodeTexts =  container.append("g");
+    ..lines = container.append("g")
+    ..nodes = container.append("g")
+    ..connectionNodes = container.append("g")
+    ..nodeTexts =  container.append("g");
     
     void mouseUp(dynamic d, int ei, Element e) {
       scope.event.preventDefault();
@@ -87,13 +93,14 @@ class DebateGraph {
       if(dragged != null) {
         dragged.x += tracker.movement.x / zoom;
         dragged.y += tracker.movement.y / zoom;
+        update();
       } else if(panning) {
         origin.x += tracker.movement.x;
         origin.y += tracker.movement.y;
         container.attr("transform", "translate(${origin.x}, ${origin.y})scale($zoom)");
+        update();
       }
       tracker.updateFromEvent(e);
-      update();
     }
     
     void wheel(dynamic d, int ei, Element e) {
@@ -113,71 +120,88 @@ class DebateGraph {
     svg.on("wheel", wheel);
   }
   
+  void selectAssertion(Assertion a) {
+    selected = a;
+    if(onSelected != null) {
+      onSelected(a, this);
+    }
+    update();
+  }
   void update() {
     var nodeColor = (d,i,e) => nodeColors[d.status];
     var connectionColor = (d,i,e) => connectionColors[d.type];
     var getId = (a) => a.id;
-    
+    var isSelected = (d) => selected != null && d.id == selected.id;
     var lines = layers.lines.selectAll("line").data(debate.connections, getId);
     lines.enter.append("line")
-      ..styleWithCallback("stroke", connectionColor)
-      ..attrWithCallback("x1", (d,i,e) => d.premise.x)
-      ..attrWithCallback("y1", (d,i,e) => d.premise.y)
-      ..attrWithCallback("x2", (d,i,e) => d.assertion.x)
-      ..attrWithCallback("y2", (d,i,e) => d.assertion.y);
+    ..styleWithCallback("stroke", connectionColor)
+    ..attrWithCallback("x1", (d,i,e) => d.premise.x)
+    ..attrWithCallback("y1", (d,i,e) => d.premise.y)
+    ..attrWithCallback("x2", (d,i,e) => d.assertion.x)
+    ..attrWithCallback("y2", (d,i,e) => d.assertion.y);
     
     lines.transition()
-      ..duration(25)
-      ..styleWithCallback("stroke", connectionColor)
-      ..attrWithCallback("x1", (d,i,e) => d.premise.x)
-      ..attrWithCallback("y1", (d,i,e) => d.premise.y)
-      ..attrWithCallback("x2", (d,i,e) => d.assertion.x)
-      ..attrWithCallback("y2", (d,i,e) => d.assertion.y);
+    ..duration(25)
+    ..styleWithCallback("stroke", connectionColor)
+    ..attrWithCallback("x1", (d,i,e) => d.premise.x)
+    ..attrWithCallback("y1", (d,i,e) => d.premise.y)
+    ..attrWithCallback("x2", (d,i,e) => d.assertion.x)
+    ..attrWithCallback("y2", (d,i,e) => d.assertion.y);
 
     lines.exit.remove();
     
     var connectionNodes = layers.connectionNodes.selectAll("circle").data(debate.connections, getId);
     connectionNodes.enter.append("circle")
-      ..attrWithCallback("cx", (d,i,e) => d.x)
-      ..attrWithCallback("cy", (d,i,e) => d.y)
-      ..attrWithCallback("fill", nodeColor)
-      ..attr("r", "5px");
+    ..attrWithCallback("cx", (d,i,e) => d.x)
+    ..attrWithCallback("cy", (d,i,e) => d.y)
+    ..attrWithCallback("fill", nodeColor)
+    ..attr("r", "5px")
+    ..style("stroke", "#888888")
+    ..styleWithCallback("stroke-width", ((d,i,e) => isSelected(d) ? "1px" : "0"))
+    ..on("mousedown", (d,i,e) => selectAssertion(d));
     
     connectionNodes.transition()
-      ..duration(25)
-      ..attrWithCallback("fill", nodeColor)
-      ..attrWithCallback("cx", (d,i,e) => d.x)
-      ..attrWithCallback("cy", (d,i,e) => d.y);
+    ..duration(25)
+    ..attrWithCallback("fill", nodeColor)
+    ..styleWithCallback("stroke-width", ((d,i,e) => isSelected(d) ? "1px" : "0"))
+    ..attrWithCallback("cx", (d,i,e) => d.x)
+    ..attrWithCallback("cy", (d,i,e) => d.y);
       
     connectionNodes.exit.remove();
 
     var nodes = layers.nodes.selectAll("circle").data(debate.premises, getId);
     nodes.enter.append("circle")
-      ..attrWithCallback("cx", (d,i,e) => d.x)
-      ..attrWithCallback("cy", (d,i,e) => d.y)
-      ..attrWithCallback("fill", nodeColor)
-      ..attr("r", "10px")
-      ..on("mousedown", (d,i,e) => dragged = d)
-      ..on("mouseup", (d,i,e) => dragged = null);
+    ..attrWithCallback("cx", (d,i,e) => d.x)
+    ..attrWithCallback("cy", (d,i,e) => d.y)
+    ..attrWithCallback("fill", nodeColor)
+    ..attr("r", "10px")
+    ..style("stroke", "#888888")
+    ..styleWithCallback("stroke-width", ((d,i,e) => isSelected(d) ? "2px" : "0"))
+    ..on("mousedown", (d,i,e) {
+      dragged = d;
+      selectAssertion(d);
+    })
+    ..on("mouseup", (d,i,e) => dragged = null);
     
     nodes.transition()
-      ..duration(25)
-      ..attrWithCallback("fill", nodeColor)
-      ..attrWithCallback("cx", (d,i,e) => d.x)
-      ..attrWithCallback("cy", (d,i,e) => d.y);
+    ..duration(25)
+    ..attrWithCallback("fill", nodeColor)
+    ..attrWithCallback("cx", (d,i,e) => d.x)
+    ..attrWithCallback("cy", (d,i,e) => d.y)
+    ..styleWithCallback("stroke-width", (d,i,e) => isSelected(d) ? 2 : 0);
     
     nodes.exit.remove();
     
     var nodeTexts = layers.nodeTexts.selectAll("text").data(debate.premises, getId);
     nodeTexts.enter.append("svg:text")
-      ..attrWithCallback("x", (d,i,e) => d.x)
-      ..attrWithCallback("y", (d,i,e) => d.y)
-      ..textWithCallback((d,i,e) => d.text);
+    ..attrWithCallback("x", (d,i,e) => d.x)
+    ..attrWithCallback("y", (d,i,e) => d.y)
+    ..textWithCallback((d,i,e) => d.text);
     
     nodeTexts.transition()
-      ..duration(25)
-      ..attrWithCallback("x", (d,i,e) => d.x)
-      ..attrWithCallback("y", (d,i,e) => d.y);
+    ..duration(25)
+    ..attrWithCallback("x", (d,i,e) => d.x)
+    ..attrWithCallback("y", (d,i,e) => d.y);
       
     nodeTexts.exit.remove();
   }
