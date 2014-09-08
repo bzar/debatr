@@ -16,6 +16,8 @@ class Point {
   num x;
   num y;
   operator -(Point other) => new Point(x - other.x, y - other.y);
+  operator +(Point other) => new Point(x + other.x, y + other.y);
+  operator /(num d) => new Point(x/d, y/d);
 }
 
 class MouseMovementTracker {
@@ -47,6 +49,8 @@ class DebateGraph {
   
   num zoom = 1;
   Point origin = new Point(0, 0);
+  Point get size => new Point(scope.root.clientWidth, scope.root.clientHeight);
+  Point get center => origin + size / zoom / 2;
   
   static final Map<String, String> nodeColors = {
     "undisputed": "#00f000",
@@ -195,7 +199,9 @@ class DebateGraph {
     var nodeTexts = layers.nodeTexts.selectAll("text").data(debate.premises, getId);
     nodeTexts.enter.append("svg:text")
     ..attrWithCallback("x", (d,i,e) => d.x)
-    ..attrWithCallback("y", (d,i,e) => d.y)
+    ..attrWithCallback("y", (d,i,e) => d.y);
+    
+    nodeTexts
     ..textWithCallback((d,i,e) => d.text);
     
     nodeTexts.transition()

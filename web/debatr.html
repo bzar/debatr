@@ -17,24 +17,21 @@
     <div id="graph">
     </div>
 
-    <div id="assertion-info">
+    <form id="tools">
+      <button id="addStatement">Add statement</button>
+      <button id="addEvidence">Add evidence</button>
+      <button id="addDispute">Disputes</button>
+      <button id="addSupport">Supports</button>
+    </form>
+
+    <form id="assertion-info">
       <ul id="assertion-properties">
         <li id="assertion-type-item">Type: <span id="assertion-type"></span></li>
-        <li id="assertion-statement-item">Statement: <span id="assertion-statement"></span></li>
+        <li id="assertion-statement-item">Statement: <input id="assertion-statement"></input></li>
         <li id="assertion-status-item">Status: <span id="assertion-status"></span></li>
         <li id="assertion-target-item">Target: <span id="assertion-target"></span></li>
         <li id="assertion-premise-item">Premise: <span id="assertion-premise"></span></li>
       </ul>
-    </div>
-
-    <form id="dispute">
-      <input type="text" id="dispute-text">
-      <input type="submit" value="dispute" id="dispute-submit">
     </form>
-    <form id="support">
-      <input type="text" id="support-text">
-      <input type="submit" value="support" id="support-submit">
-    </form>
-
   </body>
 </html>

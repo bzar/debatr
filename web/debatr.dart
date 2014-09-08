@@ -16,68 +16,90 @@ void main() {
   DebateGraph graph = new DebateGraph("#graph", debate);
   graph.update();
 
+  Assertion target;
+  String connectionType;
+  
   graph.onSelected = (a, g) {
+    if(target != null) {
+      Connection connection = new Connection()
+      ..type = connectionType
+      ..status = "undisputed"
+      ..premiseId = target.id
+      ..assertionId = a.id;
+      debate.add(connection);
+      debate.refresh();
+      graph.update();
+      target = null;
+    }
     updateAssertionInfo(a);
   };
 
-  document.querySelector("#dispute").onSubmit.listen((Event e) {
+  document.querySelector("#tools").onSubmit.listen((Event e) {
     e.preventDefault();
-    if(graph.selected != null) {
+  });
+  document.querySelector("#assertion-info").onSubmit.listen((Event e) {
+    e.preventDefault();
+  });
+  document.querySelector("#addStatement").onClick.listen((Event e) {
+    e.preventDefault();
+    Premise statement = new Premise()
+    ..type = "statement"
+    ..text = ""
+    ..status = "undisputed"
+    ..x = graph.center.x
+    ..y = graph.center.y;
+
+    String statementId = debate.add(statement);
+    graph.selectAssertion(debate.get(statementId));
+  });
+  document.querySelector("#addEvidence").onClick.listen((Event e) {
+      e.preventDefault();
       Premise statement = new Premise()
-      ..type = "statement"
-      ..text = (document.querySelector("#dispute-text") as InputElement).value
+      ..type = "evidence"
+      ..text = ""
       ..status = "undisputed"
-      ..x = graph.selected.x + 100
-      ..y = graph.selected.y;
+      ..x = graph.center.x
+      ..y = graph.center.y;
 
       String statementId = debate.add(statement);
-
-      Connection dispute = new Connection()
-      ..type = "dispute"
-      ..status = "undisputed"
-      ..assertionId = graph.selected.id
-      ..premiseId = statementId;
-
-      debate.add(dispute);
-
-      debate.refresh();
-      graph.update();
-    }
-
+      graph.selectAssertion(debate.get(statementId));
   });
-
-  document.querySelector("#support").onSubmit.listen((Event e) {
+  
+  
+  document.querySelector("#addDispute").onClick.listen((Event e) {
+    e.preventDefault();
+    if(graph.selected != null) {
+      target = graph.selected;
+      connectionType = "dispute";
+    }
+  });  
+  document.querySelector("#addSupport").onClick.listen((Event e) {
       e.preventDefault();
       if(graph.selected != null) {
-        Premise statement = new Premise()
-        ..type = "statement"
-        ..text = (document.querySelector("#support-text") as InputElement).value
-        ..status = "undisputed"
-        ..x = graph.selected.x + 100
-        ..y = graph.selected.y;
-
-        String statementId = debate.add(statement);
-
-        Connection support = new Connection()
-        ..type = "support"
-        ..status = "undisputed"
-        ..assertionId = graph.selected.id
-        ..premiseId = statementId;
-
-        debate.add(support);
-
-        debate.refresh();
-        graph.update();
+        target = graph.selected;
+        connectionType = "support";
       }
-
     });
+  document.querySelector("#assertion-statement").onInput.listen((Event e) {
+    if(graph.selected != null && graph.selected is Premise) {
+      (graph.selected as Premise).text = (document.querySelector("#assertion-statement") as InputElement).value;
+      graph.update();
+    }
+  });
 }
 
 void updateAssertionInfo(Assertion a) {
   var setText = (sel, t) => document.querySelector(sel).text = t;
   setText("#assertion-type", a.type);
-  setText("#assertion-statement", a is Premise ? a.text : "");
   setText("#assertion-status", a.status);
-  setText("#assertion-target", a is Connection ? a.assertionId : "");
-  setText("#assertion-premise", a is Connection ? a.premiseId : "");
+  if(a is Premise) {
+    (document.querySelector("#assertion-statement") as InputElement).value = a.text;
+  } else {
+    setText("#assertion-target", a is Connection ? a.assertionId : "");
+    setText("#assertion-premise", a is Connection ? a.premiseId : "");
+  }
+    
+  document.querySelector("#assertion-target-item").hidden = a is Premise;
+  document.querySelector("#assertion-premise-item").hidden = a is Premise;
+  document.querySelector("#assertion-statement-item").hidden = a is Connection;
 }
