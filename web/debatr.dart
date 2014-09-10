@@ -74,12 +74,19 @@ void main() {
     }
   });  
   document.querySelector("#addSupport").onClick.listen((Event e) {
-      e.preventDefault();
-      if(graph.selected != null) {
-        target = graph.selected;
-        connectionType = "support";
-      }
-    });
+    e.preventDefault();
+    if(graph.selected != null) {
+      target = graph.selected;
+      connectionType = "support";
+    }
+  });
+  document.querySelector("#addCause").onClick.listen((Event e) {
+    e.preventDefault();
+    if(graph.selected != null) {
+      target = graph.selected;
+      connectionType = "cause";
+    }
+  });
   document.querySelector("#assertion-statement").onInput.listen((Event e) {
     if(graph.selected != null && graph.selected is Premise) {
       (graph.selected as Premise).text = (document.querySelector("#assertion-statement") as InputElement).value;
