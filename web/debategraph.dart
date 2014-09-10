@@ -54,7 +54,7 @@ class DebateGraph {
 
   num premiseNodeRadius = 10;
   num connectionNodeRadius = 5;
-  
+
   static final Map<String, String> statusColors = {
     "undisputed": "#88cc88",
     "disputed": "#cc8888",
@@ -80,34 +80,32 @@ class DebateGraph {
 
     var defs = svg.append("svg:defs");
     var premiseMarker = defs.append("svg:marker")
-    ..attr("id", "premise-arrow")
-    ..attr("viewBox", "0 -5 10 10")
-    ..attr("refX", 8 + premiseNodeRadius)
-    ..attr("markerUnits", "userSpaceOnUse")
-    ..attr("markerWidth", 10)
-    ..attr("markerHeight", 10)
-    ..attr("orient", "auto")
-    ..attr("fill", "#aaa");    
-    premiseMarker.append("svg:path")
-    ..attr("d", "M0,-5L10,0L0,5");
+        ..attr("id", "premise-arrow")
+        ..attr("viewBox", "0 -5 10 10")
+        ..attr("refX", 8 + premiseNodeRadius)
+        ..attr("markerUnits", "userSpaceOnUse")
+        ..attr("markerWidth", 10)
+        ..attr("markerHeight", 10)
+        ..attr("orient", "auto")
+        ..attr("fill", "#aaa");
+    premiseMarker.append("svg:path")..attr("d", "M0,-5L10,0L0,5");
     var connectionMarker = defs.append("svg:marker")
-    ..attr("id", "connection-arrow")
-    ..attr("viewBox", "0 -5 10 10")
-    ..attr("refX", 8 + connectionNodeRadius)
-    ..attr("markerUnits", "userSpaceOnUse")
-    ..attr("markerWidth", 10)
-    ..attr("markerHeight", 10)
-    ..attr("orient", "auto")
-    ..attr("fill", "#aaa");    
-    connectionMarker.append("svg:path")
-    ..attr("d", "M0,-5L10,0L0,5");
+        ..attr("id", "connection-arrow")
+        ..attr("viewBox", "0 -5 10 10")
+        ..attr("refX", 8 + connectionNodeRadius)
+        ..attr("markerUnits", "userSpaceOnUse")
+        ..attr("markerWidth", 10)
+        ..attr("markerHeight", 10)
+        ..attr("orient", "auto")
+        ..attr("fill", "#aaa");
+    connectionMarker.append("svg:path")..attr("d", "M0,-5L10,0L0,5");
 
     Selection container = svg.append("g");
     layers = new Layers()
-    ..lines = container.append("g")
-    ..nodes = container.append("g")
-    ..connectionNodes = container.append("g")
-    ..nodeTexts = container.append("g");
+        ..lines = container.append("g")
+        ..nodes = container.append("g")
+        ..connectionNodes = container.append("g")
+        ..nodeTexts = container.append("g");
 
     void mouseUp(dynamic d, int ei, Element e) {
       scope.event.preventDefault();
@@ -173,106 +171,106 @@ class DebateGraph {
 
     var lines = layers.lines.selectAll("line").data(debate.connections, getId);
     lines.enter.append("line")
-    ..styleWithCallback("stroke", connectionColor)
-    ..attrWithCallback("x1", (d, i, e) => d.premise.x)
-    ..attrWithCallback("y1", (d, i, e) => d.premise.y)
-    ..attrWithCallback("x2", (d, i, e) => d.assertion.x)
-    ..attrWithCallback("y2", (d, i, e) => d.assertion.y)
-    ..style("stroke-width", "3px")
-    ..styleWithCallback("marker-end", (d,i,e) => (d.assertion is Premise ? "url(#premise-arrow)" : "url(#connection-arrow)"));
+        ..styleWithCallback("stroke", connectionColor)
+        ..attrWithCallback("x1", (d, i, e) => d.premise.x)
+        ..attrWithCallback("y1", (d, i, e) => d.premise.y)
+        ..attrWithCallback("x2", (d, i, e) => d.assertion.x)
+        ..attrWithCallback("y2", (d, i, e) => d.assertion.y)
+        ..style("stroke-width", "3px")
+        ..styleWithCallback("marker-end", (d, i, e) => (d.assertion is Premise ? "url(#premise-arrow)" : "url(#connection-arrow)"));
 
     lines.transition()
-    ..duration(25)
-    ..styleWithCallback("stroke", connectionColor)
-    ..attrWithCallback("x1", (d, i, e) => d.premise.x)
-    ..attrWithCallback("y1", (d, i, e) => d.premise.y)
-    ..attrWithCallback("x2", (d, i, e) => d.assertion.x)
-    ..attrWithCallback("y2", (d, i, e) => d.assertion.y);
+        ..duration(25)
+        ..styleWithCallback("stroke", connectionColor)
+        ..attrWithCallback("x1", (d, i, e) => d.premise.x)
+        ..attrWithCallback("y1", (d, i, e) => d.premise.y)
+        ..attrWithCallback("x2", (d, i, e) => d.assertion.x)
+        ..attrWithCallback("y2", (d, i, e) => d.assertion.y);
 
     lines.exit.remove();
 
     var connectionNodes = layers.connectionNodes.selectAll("circle").data(debate.connections, getId);
     connectionNodes.enter.append("circle")
-    ..attr("r", "5px")
-    ..style("stroke", "#555")
-    ..attrWithCallback("fill", statusColor)
-    ..styleWithCallback("stroke-width", ((d, i, e) => isSelected(d) ? "2px" : "0px"))
-    ..attrWithCallback("cx", (d, i, e) => d.x)
-    ..attrWithCallback("cy", (d, i, e) => d.y)
-    ..on("mousedown", (d, i, e) => selectAssertion(d));
+        ..attr("r", "5px")
+        ..style("stroke", "#555")
+        ..attrWithCallback("fill", statusColor)
+        ..styleWithCallback("stroke-width", ((d, i, e) => isSelected(d) ? "2px" : "0px"))
+        ..attrWithCallback("cx", (d, i, e) => d.x)
+        ..attrWithCallback("cy", (d, i, e) => d.y)
+        ..on("mousedown", (d, i, e) => selectAssertion(d));
 
     connectionNodes.transition()
-    ..duration(25)
-    ..attrWithCallback("fill", statusColor)
-    ..styleWithCallback("stroke-width", ((d, i, e) => isSelected(d) ? "2px" : "0px"))
-    ..attrWithCallback("cx", (d, i, e) => d.x)
-    ..attrWithCallback("cy", (d, i, e) => d.y);
+        ..duration(25)
+        ..attrWithCallback("fill", statusColor)
+        ..styleWithCallback("stroke-width", ((d, i, e) => isSelected(d) ? "2px" : "0px"))
+        ..attrWithCallback("cx", (d, i, e) => d.x)
+        ..attrWithCallback("cy", (d, i, e) => d.y);
 
     connectionNodes.exit.remove();
 
     var statements = debate.premises.where((p) => p.type == "statement");
     var statementNodes = layers.nodes.selectAll("circle").data(statements, getId);
     statementNodes.enter.append("circle")
-    ..attr("r", premiseNodeRadius)
-    ..attr("fill", "#ffffff")
-    ..attrWithCallback("cx", (d, i, e) => d.x)
-    ..attrWithCallback("cy", (d, i, e) => d.y)
-    ..styleWithCallback("stroke", statusColor)
-    ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px")
-    ..on("mousedown", (d, i, e) {
-      dragged = d;
-      selectAssertion(d);
-    })
-    ..on("mouseup", (d, i, e) => dragged = null);
+        ..attr("r", premiseNodeRadius)
+        ..attr("fill", "#ffffff")
+        ..attrWithCallback("cx", (d, i, e) => d.x)
+        ..attrWithCallback("cy", (d, i, e) => d.y)
+        ..styleWithCallback("stroke", statusColor)
+        ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px")
+        ..on("mousedown", (d, i, e) {
+          dragged = d;
+          selectAssertion(d);
+        })
+        ..on("mouseup", (d, i, e) => dragged = null);
 
     statementNodes.transition()
-    ..duration(25)
-    ..attrWithCallback("cx", (d, i, e) => d.x)
-    ..attrWithCallback("cy", (d, i, e) => d.y)
-    ..styleWithCallback("stroke", statusColor)
-    ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px");
+        ..duration(25)
+        ..attrWithCallback("cx", (d, i, e) => d.x)
+        ..attrWithCallback("cy", (d, i, e) => d.y)
+        ..styleWithCallback("stroke", statusColor)
+        ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px");
 
     statementNodes.exit.remove();
 
     var evidence = debate.premises.where((p) => p.type == "evidence");
     var evidenceNodes = layers.nodes.selectAll("rect").data(evidence, getId);
     evidenceNodes.enter.append("rect")
-    ..attrWithCallback("x", (d, i, e) => d.x - premiseNodeRadius)
-    ..attrWithCallback("y", (d, i, e) => d.y - premiseNodeRadius)
-    ..attr("width", 2*premiseNodeRadius)
-    ..attr("height", 2*premiseNodeRadius)
-    ..attr("fill", "#ffffff")
-    ..styleWithCallback("stroke", statusColor)
-    ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px")
-    ..on("mousedown", (d, i, e) {
-      dragged = d;
-      selectAssertion(d);
-    })
-    ..on("mouseup", (d, i, e) => dragged = null);
+        ..attrWithCallback("x", (d, i, e) => d.x - premiseNodeRadius)
+        ..attrWithCallback("y", (d, i, e) => d.y - premiseNodeRadius)
+        ..attr("width", 2 * premiseNodeRadius)
+        ..attr("height", 2 * premiseNodeRadius)
+        ..attr("fill", "#ffffff")
+        ..styleWithCallback("stroke", statusColor)
+        ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px")
+        ..on("mousedown", (d, i, e) {
+          dragged = d;
+          selectAssertion(d);
+        })
+        ..on("mouseup", (d, i, e) => dragged = null);
 
     evidenceNodes.transition()
-    ..duration(25)
-    ..attrWithCallback("x", (d, i, e) => d.x - premiseNodeRadius)
-    ..attrWithCallback("y", (d, i, e) => d.y - premiseNodeRadius)
-    ..styleWithCallback("stroke", statusColor)
-    ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px");
+        ..duration(25)
+        ..attrWithCallback("x", (d, i, e) => d.x - premiseNodeRadius)
+        ..attrWithCallback("y", (d, i, e) => d.y - premiseNodeRadius)
+        ..styleWithCallback("stroke", statusColor)
+        ..styleWithCallback("stroke-width", (d, i, e) => isSelected(d) ? "4px" : "2px");
 
     evidenceNodes.exit.remove();
 
     var nodeTexts = layers.nodeTexts.selectAll("text").data(debate.premises, getId);
     nodeTexts.enter.append("svg:text")
-    ..style("font-family", "sans-serif")
-    ..style("font-size", "14px")
-    ..attrWithCallback("x", (d, i, e) => d.x + 12)
-    ..attrWithCallback("y", (d, i, e) => d.y);
+        ..style("font-family", "sans-serif")
+        ..style("font-size", "14px")
+        ..attrWithCallback("x", (d, i, e) => d.x + 12)
+        ..attrWithCallback("y", (d, i, e) => d.y);
 
     var elide = (s, l) => s.length <= l ? s : s.substring(0, l) + "…";
     nodeTexts..textWithCallback((d, i, e) => elide(d.text, 48));
 
     nodeTexts.transition()
-    ..duration(25)
-    ..attrWithCallback("x", (d, i, e) => d.x + 12)
-    ..attrWithCallback("y", (d, i, e) => d.y);
+        ..duration(25)
+        ..attrWithCallback("x", (d, i, e) => d.x + 12)
+        ..attrWithCallback("y", (d, i, e) => d.y);
 
     nodeTexts.exit.remove();
   }
