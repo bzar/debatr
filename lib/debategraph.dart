@@ -1,7 +1,8 @@
 library debategraph;
 
 import "dart:html" show Element, MouseEvent, WheelEvent;
-import "debate.dart";
+import 'debate.dart';
+export 'debate.dart';
 import "package:charted/charted.dart";
 
 class Layers {
@@ -72,8 +73,8 @@ class DebateGraph {
     "evidence": "#cccccc"
   };
 
-  DebateGraph(String elementSelector, this.debate) {
-    scope = new SelectionScope.selector(elementSelector);
+  DebateGraph(Element element, this.debate) {
+    scope = new SelectionScope.element(element);
     svg = scope.append("svg:svg")
         ..attr("width", "100%")
         ..attr("height", "100%");
@@ -109,21 +110,18 @@ class DebateGraph {
 
     void mouseUp(dynamic d, int ei, Element e) {
       scope.event.preventDefault();
-      scope.event.stopPropagation();
       dragged = null;
       panning = false;
     }
 
     void mouseDown(dynamic d, int ei, Element e) {
       scope.event.preventDefault();
-      scope.event.stopPropagation();
       panning = true;
       MouseEvent e = scope.event as MouseEvent;
     }
 
     void mouseMove(dynamic d, int ei, Element e) {
       scope.event.preventDefault();
-      scope.event.stopPropagation();
       MouseEvent e = scope.event as MouseEvent;
       if (dragged != null) {
         dragged.x += tracker.movement.x / zoom;
@@ -140,7 +138,6 @@ class DebateGraph {
 
     void wheel(dynamic d, int ei, Element e) {
       scope.event.preventDefault();
-      scope.event.stopPropagation();
       WheelEvent e = scope.event as WheelEvent;
       if (e.deltaY > 0 && zoom > 0.5) {
         zoom -= 0.1;

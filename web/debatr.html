@@ -1,38 +1,20 @@
 <!DOCTYPE html>
 
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Debatr</title>
-    
-    <script async type="application/dart" src="debatr.dart"></script>
-    <script async src="packages/browser/dart.js"></script>
-    
-    <link rel="stylesheet" href="debatr.css">
-  </head>
-  <body>
+<html ng-app>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debatr</title>
+
+<link rel="stylesheet" href="debatr.css">
+</head>
+<body>
+  <div debatr>
     <h1>Debatr</h1>
-    
-    <div id="graph">
-    </div>
 
-    <form id="tools">
-      <button id="addStatement">Add statement</button>
-      <button id="addEvidence">Add evidence</button>
-      <button id="addDispute">Disputes</button>
-      <button id="addSupport">Supports</button>
-      <button id="addCause">Causes</button>
-    </form>
-
-    <form id="assertion-info">
-      <ul id="assertion-properties">
-        <li id="assertion-type-item">Type: <span id="assertion-type"></span></li>
-        <li id="assertion-statement-item">Statement: <input id="assertion-statement"></input></li>
-        <li id="assertion-status-item">Status: <span id="assertion-status"></span></li>
-        <li id="assertion-target-item">Target: <span id="assertion-target"></span></li>
-        <li id="assertion-premise-item">Premise: <span id="assertion-premise"></span></li>
-      </ul>
-    </form>
-  </body>
+    <debatr-graph debate="debatr.debate"></debatr-graph>
+  </div>
+  <script async type="application/dart" src="debatr.dart"></script>
+  <script async src="packages/browser/dart.js"></script>
+</body>
 </html>

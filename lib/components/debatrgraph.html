@@ -1,0 +1,31 @@
+<div>
+  <div id="graph"></div>
+  <form>
+    <button ng-click="cmp.addStatement()">Add statement</button>
+    <button ng-click="cmp.addEvidence()">Add evidence</button>
+    <button ng-click="cmp.addDispute()">Disputes</button>
+    <button ng-click="cmp.addSupport()">Supports</button>
+    <button ng-click="cmp.addCause()">Causes</button>
+  </form>
+
+  <form>
+    <ul>
+      <li>
+        Type: <span>{{cmp.selected.type}}</span>
+      </li>
+      <li ng-if="cmp.selectedPremise != null">
+        Statement: <input ng-model="cmp.selectedPremiseText"></input>
+      </li>
+      <li>
+        Status: <span>{{cmp.selected.status}}</span>
+      </li>
+      <li ng-if="cmp.selectedConnection != null">
+        Target: <span>{{cmp.selectedConnection.assertionId}}</span>
+      </li>
+      <li ng-if="cmp.selectedConnection != null">
+        Premise: <span>{{cmp.selectedConnection.premiseId}}</span>
+      </li>
+    </ul>
+  </form>
+
+</div>
