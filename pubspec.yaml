@@ -1,8 +1,0 @@
-name: debatr
-description: A sample web application
-dependencies:
-  browser: any
-  angular: any
-  charted: ">=0.0.2 <0.1.0"
-transformers:
-- angular

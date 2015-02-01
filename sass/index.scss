@@ -1,0 +1,136 @@
+body
+{
+  background-color: #fff;
+  margin: 0 0;
+  padding: 0;
+}
+
+h1 
+{
+  font-size: 20pt;
+  margin: 0;
+  padding: 16px;
+  background-color: #111;
+  color: #fff;
+  font-family: sans-serif;
+}
+
+h2 
+{
+  margin: 0;
+  padding: 4px 4px 8px 4px;
+  font-family: sans-serif;
+  font-size: 18pt;
+}
+
+.assertionView
+{
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.assertionView > * {
+  vertical-align: top; 
+  font-size: 0;
+}
+.assertionView ul
+{
+  list-style: none;
+  padding: 0;
+}
+
+.assertionView-connections
+{
+  @media (min-width: 1200px) {
+    display: inline-block;
+    width: 300px;
+    min-height: 300px;
+  }
+  background-color: #eee;
+  
+  li {
+    margin: 4px;
+  }
+}
+
+.assertionView-content
+{
+  @media (min-width: 1200px) {
+    display: inline-block;
+    width: 600px;
+    min-height: 300px;
+  }
+  box-sizing: border-box;
+  border: 8px solid;
+  background-color: #fff;
+  
+  input {
+    width: calc(100% - 8px);
+    margin: 4px;
+    font-size: 14pt;
+  }
+}
+
+.assertionView-link
+{
+  box-sizing: border-box;
+  border: 3px solid;
+  display: inline-block;
+  color: white;
+  font-size: 12pt; 
+  font-family: sans-serif;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 8px;
+  width: 50%;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  height: 42px;
+  white-space: nowrap;
+}
+
+.assertionView-link.single
+{
+  width: 100%;
+}
+
+.statement
+{
+  background-color: #999;
+}
+
+.evidence
+{
+  background-color: #ccc;  
+}
+
+.dispute
+{
+  background-color: #f88;  
+}
+
+.support
+{
+  background-color: #8f8;  
+}
+
+.cause
+{
+  background-color: #88f;  
+}
+
+.undisputed
+{
+  border-color: #8c8;  
+}
+
+.disputed
+{
+  border-color: #c88;  
+}
+
+.controversial
+{
+  border-color: #cc8;  
+}
